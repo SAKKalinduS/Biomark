@@ -87,6 +87,7 @@ class AuthService extends ChangeNotifier {
           'salt': salt,
         });
         print('4');
+        user.id = uniqueId;
         _currentUser = user;
         notifyListeners();
         return true;
