@@ -179,14 +179,16 @@ class ProfileScreen extends StatelessWidget {
                                     'Unsubscribe',
                                     style: TextStyle(color: Colors.red[400]),
                                   ),
-                                  onPressed: () => Navigator.of(context).pop(true),
+                                  onPressed: () async {
+                                    await authService.unsubscribe();
+                                    Navigator.of(context).pop(true);
+                                  }
                                 ),
                               ],
                             ),
                           );
 
                           if (confirmed == true) {
-                            await authService.unsubscribe();
                             Navigator.pushReplacementNamed(context, '/');
                           }
                         },
