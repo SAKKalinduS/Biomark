@@ -251,4 +251,75 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> changeEmail(String newEmail, String currentPassword) async {
+    try {
+      if (_currentUser == null) {
+        return {
+          'success': false,
+          'error': 'No user is currently logged in'
+        };
+      }
+
+      // Fetch current user data from SQLite to verify password
+      final localUser = await SQLiteHelper.instance.query(
+          'Users',
+          where: 'id = ?',
+          whereArgs: [_currentUser!.id != null ? EncryptionHelper.encryptData(_currentUser!.id!) : '']  // Check for null and use empty string if null
+      );
+
+      if (localUser.isEmpty) {
+        return {
+          'success': false,
+          'error': 'User data not found'
+        };
+      }
+
+      final userData = localUser.first;
+      final storedPasswordHash = userData['passwordHash'] as String;
+      final salt = userData['salt'] as String;
+
+      if (storedPasswordHash.isEmpty || salt.isEmpty) {
+        return {
+          'success': false,
+          'error': 'Password verification failed'
+        };
+      }
+
+      // Verify current password
+      final hashedInputPassword = _hashPassword(currentPassword, salt);
+      if (hashedInputPassword != storedPasswordHash) {
+        return {
+          'success': false,
+          'error': 'Current password is incorrect'
+        };
+      }
+
+      // Encrypt new email
+      final encryptedNewEmail = EncryptionHelper.encryptData(newEmail);
+
+      // Update email in SQLite
+      await SQLiteHelper.instance.update(
+          'Users',
+          {'email': encryptedNewEmail},
+          'id = ?',
+          [_currentUser!.id != null ? EncryptionHelper.encryptData(_currentUser!.id!) : '']  // Check for null and use empty string if null
+      );
+
+      // Update current user object
+      _currentUser!.email = newEmail;
+      notifyListeners();
+
+      return {
+        'success': true,
+        'error': null
+      };
+    } catch (e) {
+      print('Change email error: $e');
+      return {
+        'success': false,
+        'error': 'Failed to change email: ${e.toString()}'
+      };
+    }
+  }
+
 }
