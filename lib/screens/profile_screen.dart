@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart';
+import 'email_change_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   Widget _buildInfoCard(String label, String value) {
@@ -127,7 +128,7 @@ class ProfileScreen extends StatelessWidget {
                           elevation: 5,
                         ),
                         child: Text(
-                          'Update Profile',
+                          'Update Email Address',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -135,6 +136,12 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         onPressed: () {
                           // Implement profile update functionality
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UpdateEmailScreen(),
+                            ),
+                          );
                         },
                       ),
                     ),
