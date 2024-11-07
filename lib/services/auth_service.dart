@@ -322,4 +322,71 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword) async {
+    try {
+      // Ensure the user is logged in
+      if (_currentUser == null) {
+        return {
+          'success': false,
+          'error': 'No user is currently logged in'
+        };
+      }
+
+      // Fetch the current user data from SQLite
+      final localUser = await SQLiteHelper.instance.query(
+          'Users',
+          where: 'id = ?',
+          whereArgs: [_currentUser!.id != null ? EncryptionHelper.encryptData(_currentUser!.id!) : '']  // Use encrypted user ID
+      );
+
+      if (localUser.isEmpty) {
+        return {
+          'success': false,
+          'error': 'User data not found'
+        };
+      }
+
+      final userData = localUser.first;
+      final storedPasswordHash = userData['passwordHash'] as String;
+      final salt = userData['salt'] as String;
+
+      // Verify the current password
+      final hashedCurrentPassword = _hashPassword(currentPassword, salt);
+      if (hashedCurrentPassword != storedPasswordHash) {
+        return {
+          'success': false,
+          'error': 'Current password is incorrect'
+        };
+      }
+
+      // Generate a new salt and hash for the new password
+      final newSalt = _generateSalt();
+      final newHashedPassword = _hashPassword(newPassword, newSalt);
+
+      // Update the password and salt in SQLite
+      await SQLiteHelper.instance.update(
+          'Users',
+          {
+            'passwordHash': newHashedPassword,
+            'salt': newSalt
+          },
+          'id = ?',
+          [_currentUser!.id != null ? EncryptionHelper.encryptData(_currentUser!.id!) : '']  // Use encrypted user ID
+      );
+
+      // Return success message
+      return {
+        'success': true,
+        'error': null
+      };
+    } catch (e) {
+      print('Change password error: $e');
+      return {
+        'success': false,
+        'error': 'Failed to change password: ${e.toString()}'
+      };
+    }
+  }
+
+
 }
