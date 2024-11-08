@@ -51,7 +51,7 @@ class AuthService extends ChangeNotifier {
         'mothersMaidenName': EncryptionHelper.encryptData(user.mothersMaidenName),
         'childhoodFriend': EncryptionHelper.encryptData(user.childhoodFriend),
         'childhoodPet': EncryptionHelper.encryptData(user.childhoodPet),
-        'ownQuestionAnswer': EncryptionHelper.encryptData(user.securityQuestion),
+        'securityQuestion': EncryptionHelper.encryptData(user.securityQuestion),
         'email': EncryptionHelper.encryptData(user.email),
       };
       print('2');
@@ -388,5 +388,169 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> verifySecurityQuestions({required String email, required String mothersMaidenName, required String childhoodFriend, required String childhoodPet, required String securityQuestion,}) async {
+    try {
+      // First, find the user by encrypted email
+      final encryptedEmail = EncryptionHelper.encryptData(email);
+      final localUser = await SQLiteHelper.instance.query(
+        'Users',
+        where: 'email = ?',
+        whereArgs: [encryptedEmail],
+      );
+
+      if (localUser.isEmpty) {
+        return {
+          'success': false,
+          'errors': {
+            'email': 'No account found with this email address'
+          }
+        };
+      }
+
+      final userData = localUser.first;
+
+      // Decrypt stored security answers for comparison
+      final storedMothersMaidenName = EncryptionHelper.decryptData(userData['mothersMaidenName'] as String);
+      final storedChildhoodFriend = EncryptionHelper.decryptData(userData['childhoodFriend'] as String);
+      final storedChildhoodPet = EncryptionHelper.decryptData(userData['childhoodPet'] as String);
+      final storedSecurityQuestion = EncryptionHelper.decryptData(userData['securityQuestion'] as String);
+
+      // Convert all answers to lowercase for case-insensitive comparison
+      final normalizedInput = {
+        'mothersMaidenName': mothersMaidenName.trim().toLowerCase(),
+        'childhoodFriend': childhoodFriend.trim().toLowerCase(),
+        'childhoodPet': childhoodPet.trim().toLowerCase(),
+        'securityQuestion': securityQuestion.trim().toLowerCase(),
+      };
+
+      final normalizedStored = {
+        'mothersMaidenName': storedMothersMaidenName.trim().toLowerCase(),
+        'childhoodFriend': storedChildhoodFriend.trim().toLowerCase(),
+        'childhoodPet': storedChildhoodPet.trim().toLowerCase(),
+        'securityQuestion': storedSecurityQuestion.trim().toLowerCase(),
+      };
+
+      // Track individual field errors
+      Map<String, String> fieldErrors = {};
+      int correctAnswers = 0;
+
+      // Check each field individually
+      if (normalizedInput['mothersMaidenName'] == normalizedStored['mothersMaidenName']) {
+        correctAnswers++;
+      } else {
+        fieldErrors['mothersMaidenName'] = 'Incorrect answer';
+      }
+
+      if (normalizedInput['childhoodFriend'] == normalizedStored['childhoodFriend']) {
+        correctAnswers++;
+      } else {
+        fieldErrors['childhoodFriend'] = 'Incorrect answer';
+      }
+
+      if (normalizedInput['childhoodPet'] == normalizedStored['childhoodPet']) {
+        correctAnswers++;
+      } else {
+        fieldErrors['childhoodPet'] = 'Incorrect answer';
+      }
+
+      if (normalizedInput['securityQuestion'] == normalizedStored['securityQuestion']) {
+        correctAnswers++;
+      } else {
+        fieldErrors['securityQuestion'] = 'Incorrect answer';
+      }
+
+
+      if (correctAnswers == 4) {
+        // Set the current user for the session
+        final decryptedId = EncryptionHelper.decryptData(userData['id'] as String);
+
+        // Fetch additional user data from MongoDB
+        final mongoUser = await MongoDBHelper.instance.findOne(
+            'users',
+            where.eq('dataSampleId', decryptedId)
+        );
+
+        if (mongoUser != null) {
+          _currentUser = User.fromJson({
+            ...mongoUser,
+            'id': decryptedId,
+            'email': email,
+            'fullName': EncryptionHelper.decryptData(userData['fullName'] as String),
+            'mothersMaidenName': storedMothersMaidenName,
+            'childhoodFriend': storedChildhoodFriend,
+            'childhoodPet': storedChildhoodPet,
+            'securityQuestion': storedSecurityQuestion,
+          });
+
+          notifyListeners();
+          return {
+            'success': true,
+            'errors': null
+          };
+        }
+      }
+
+      // Return specific field errors
+      return {
+        'success': false,
+        'errors': fieldErrors.isEmpty ? {
+          'general': 'The provided answers do not match our records. Please try again.'
+        } : fieldErrors
+      };
+
+    } catch (e) {
+      print('Security questions verification error: $e');
+      return {
+        'success': false,
+        'errors': {
+          'general': 'An error occurred while verifying security questions. Please try again later.'
+        }
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(String newPassword) async {
+    try {
+      // Ensure the user is logged in
+      if (_currentUser == null) {
+        return {
+          'success': false,
+          'error': 'No current user exist.'
+        };
+      }
+
+      // Generate a new salt and hash the new password
+      final newSalt = _generateSalt();
+      final newHashedPassword = _hashPassword(newPassword, newSalt);
+
+      // Update password in SQLite
+      await SQLiteHelper.instance.update(
+          'Users',
+          {
+            'passwordHash': newHashedPassword,
+            'salt': newSalt
+          },
+          'id = ?',
+          [_currentUser!.id != null ? EncryptionHelper.encryptData(_currentUser!.id!) : '']
+      );
+
+      // final islogin=login(_currentUser!.email, newPassword);
+
+      // if (islogin == true) {
+      //   print("login successful!");
+      // }
+
+      return {
+        'success': true,
+        'error': null
+      };
+    } catch (e) {
+      print('Reset password error: $e');
+      return {
+        'success': false,
+        'error': 'Failed to reset password: ${e.toString()}'
+      };
+    }
+  }
 
 }
