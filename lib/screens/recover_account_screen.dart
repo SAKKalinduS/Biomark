@@ -301,8 +301,8 @@ class _AccountRecoveryScreenState extends State<AccountRecoveryScreen> {
 
                     _buildInputField(
                       controller: _securityQuestionController,
-                      label: 'Your Security Question Answer',
-                      icon: Icons.security,
+                      label: 'Favorite Movie Title',
+                      icon: Icons.movie_outlined,
                       errorText: _securityQuestionError,
                     ),
 
