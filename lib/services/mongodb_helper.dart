@@ -10,7 +10,7 @@ class MongoDBHelper {
   Future<void> initialize() async {
     if (!_isInitialized) {
       try {
-        // MongoDB URI with TLS/SSL enabled
+        // MongoDB URI
         final uri = 'mongodb+srv://sankalpa5285:m2bhv447MvO8b05L@sricare.nwmoh.mongodb.net/Biomark';
 
         _db = await Db.create(uri);

@@ -41,7 +41,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    // Add listeners to all controllers to validate form
     emailController.addListener(_validateForm);
     fullNameController.addListener(_validateForm);
     passwordController.addListener(_validateForm);
@@ -60,7 +59,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    // Remove listeners and dispose controllers
     emailController.removeListener(_validateForm);
     fullNameController.removeListener(_validateForm);
     passwordController.removeListener(_validateForm);
@@ -117,7 +115,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ? 'Passwords do not match'
           : null;
 
-      // Check if all required fields are filled
       _isFormValid = isEmailValid &&
           isPasswordValid &&
           doPasswordsMatch &&
@@ -304,7 +301,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Header
                       Container(
                         height: 200,
                         width: 200,
@@ -325,7 +321,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       SizedBox(height: 32),
 
-                      // Personal Information
                       Text(
                         'Personal Information',
                         style: TextStyle(
@@ -362,7 +357,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         errorText: _confirmPasswordError,
                       ),
 
-                      // Birth Information
                       SizedBox(height: 24),
                       Text(
                         'Birth Information',
@@ -393,7 +387,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         icon: Icons.location_on_outlined,
                       ),
 
-                      // Physical Characteristics
                       SizedBox(height: 24),
                       Text(
                         'Physical Characteristics',
@@ -437,7 +430,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
 
-                  // Security Questions
                   SizedBox(height: 24),
                   Text(
                     'Security Questions',
@@ -469,7 +461,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.movie_outlined,
                   ),
 
-                  // Register Button
                   SizedBox(height: 32),
                   SizedBox(
                     height: 55,

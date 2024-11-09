@@ -61,7 +61,6 @@ class _AccountRecoveryScreenState extends State<AccountRecoveryScreen> {
           ? 'Please enter a valid email address'
           : null;
 
-      // All fields should be non-empty for the form to be valid
       _isFormValid = isEmailValid &&
           _mothersMaidenNameController.text.isNotEmpty &&
           _childhoodFriendController.text.isNotEmpty &&
@@ -170,7 +169,6 @@ class _AccountRecoveryScreenState extends State<AccountRecoveryScreen> {
               _childhoodPetError = errors['childhoodPet'];
               _securityQuestionError = errors['securityQuestion'];
 
-              // If there's a general error, show it in a snackbar
               if (errors['general'] != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
