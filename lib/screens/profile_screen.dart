@@ -84,8 +84,8 @@ class ProfileScreen extends StatelessWidget {
                   titlePadding: EdgeInsets.only(left: 50, bottom: 10),
                   background: Container(
                     color: Colors.grey[100],
-                    height: 200, // Adjust this value based on your logo size
-                    width: 200,  // Adjust this value based on your logo size
+                    height: 200,
+                    width: 200,
                     child: Image.asset(
                       'lib/images/2.png',
                       fit: BoxFit.contain,
@@ -112,7 +112,7 @@ class ProfileScreen extends StatelessWidget {
                     _buildInfoCard('Location of Birth', user.locationOfBirth),
                     _buildInfoCard('Blood Group', user.bloodGroup),
                     _buildInfoCard('Sex', user.sex),
-                    _buildInfoCard('Height', user.height),
+                    _buildInfoCard('Height (cm)', user.height),
                     _buildInfoCard('Ethnicity', user.ethnicity),
                     _buildInfoCard('Eye Color', user.eyeColor),
                     SizedBox(height: 24),
@@ -136,7 +136,6 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // Implement profile update functionality
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -167,7 +166,6 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // Implement profile update functionality
                           Navigator.push(
                             context,
                             MaterialPageRoute(

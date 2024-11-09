@@ -31,10 +31,9 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo or App Name
                   Container(
-                    height: 200, // Adjust this value based on your logo size
-                    width: 200,  // Adjust this value based on your logo size
+                    height: 200,
+                    width: 200,
                     child: Image.asset(
                         'lib/images/1.png',
                         fit: BoxFit.contain,
@@ -75,7 +74,6 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Password Field
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -100,12 +98,10 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12),
-                  // Forgot Password Link
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Implement password recovery
                         Navigator.pushNamed(context, '/recover');
                       },
                       child: Text(
@@ -113,13 +109,12 @@ class LoginScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.grey[800],
                           fontWeight: FontWeight.w500,
-                          fontSize: 16, // Increased font size
+                          fontSize: 16,
                         ),
                       ),
                     ),
                   ),
                   SizedBox(height: 24),
-                  // Login Button
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -158,7 +153,6 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24),
-                  // Register Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -166,7 +160,7 @@ class LoginScreen extends StatelessWidget {
                         "Don't have an account? ",
                         style: TextStyle(
                           color: Colors.grey[600],
-                          fontSize: 16, // Increased font size
+                          fontSize: 16,
                         ),
                       ),
                       TextButton(
@@ -178,7 +172,7 @@ class LoginScreen extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.grey[800],
                             fontWeight: FontWeight.bold,
-                            fontSize: 16, // Increased font size
+                            fontSize: 16,
                           ),
                         ),
                       ),

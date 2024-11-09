@@ -55,7 +55,7 @@ class AuthService extends ChangeNotifier {
         'email': EncryptionHelper.encryptData(user.email),
       };
       print('2');
-      // Insert minimal personal data into MongoDB
+      // Insert personal data into MongoDB
       final mongoResult = await MongoDBHelper.instance.insertOne('users', {
         'dataSampleId': uniqueId,
         'dateOfBirth': user.dateOfBirth,
@@ -106,7 +106,7 @@ class AuthService extends ChangeNotifier {
       final localUser = await SQLiteHelper.instance.query(
           'Users',
           where: 'email = ?',
-          whereArgs: [EncryptionHelper.encryptData(email)] // Encrypt email for lookup
+          whereArgs: [EncryptionHelper.encryptData(email)]
       );
 
       if (localUser.isNotEmpty) {
@@ -126,7 +126,7 @@ class AuthService extends ChangeNotifier {
           if (passwordHash == hashedInputPassword) {
             final uniqueId = EncryptionHelper.decryptData(encryptedId);
             print(uniqueId);
-            // Fetch the minimal user data from MongoDB
+            // Fetch the user data from MongoDB
             final mongoUser = await MongoDBHelper.instance.findOne(
                 'users',
                 where.eq('dataSampleId', uniqueId)
@@ -143,7 +143,7 @@ class AuthService extends ChangeNotifier {
                       : 'Unknown',
                   'fullName': user['fullName'] != null
                       ? EncryptionHelper.decryptData(user['fullName'])
-                      : 'Unknown', // Default for debugging
+                      : 'Unknown',
                   'email': user['email'] != null
                       ? EncryptionHelper.decryptData(user['email'])
                       : 'Unknown',
@@ -160,7 +160,7 @@ class AuthService extends ChangeNotifier {
                       ? EncryptionHelper.decryptData(user['ownQuestionAnswer'])
                       : 'Unknown',
                 }
-              });  // Reassemble user data
+              });
               print(currentUser);
               notifyListeners();
               return true;
@@ -194,14 +194,14 @@ class AuthService extends ChangeNotifier {
         return false;
       }
 
-      // Delete from MongoDB (minimal personal data)
+      // Delete from MongoDB
       final mongoResult = await MongoDBHelper.instance.deleteOne(
           'users',
-          where.eq('dataSampleId', userId) // Use MongoDB-stored field for deletion
+          where.eq('dataSampleId', userId)
       );
       print(mongoResult != null && mongoResult.isSuccess);
       if (mongoResult != null && mongoResult.isSuccess) {
-        // Delete from SQLite (encrypted email)
+        // Delete from SQLite
         await SQLiteHelper.instance.delete(
             'Users',
             'id = ?',
@@ -332,7 +332,7 @@ class AuthService extends ChangeNotifier {
         };
       }
 
-      // Fetch the current user data from SQLite
+      // Fetch the current user data
       final localUser = await SQLiteHelper.instance.query(
           'Users',
           where: 'id = ?',
@@ -363,7 +363,7 @@ class AuthService extends ChangeNotifier {
       final newSalt = _generateSalt();
       final newHashedPassword = _hashPassword(newPassword, newSalt);
 
-      // Update the password and salt in SQLite
+      // Update the password and salt
       await SQLiteHelper.instance.update(
           'Users',
           {
@@ -374,7 +374,6 @@ class AuthService extends ChangeNotifier {
           [_currentUser!.id != null ? EncryptionHelper.encryptData(_currentUser!.id!) : '']  // Use encrypted user ID
       );
 
-      // Return success message
       return {
         'success': true,
         'error': null
@@ -390,7 +389,7 @@ class AuthService extends ChangeNotifier {
 
   Future<Map<String, dynamic>> verifySecurityQuestions({required String email, required String mothersMaidenName, required String childhoodFriend, required String childhoodPet, required String securityQuestion,}) async {
     try {
-      // First, find the user by encrypted email
+      //find the user by email
       final encryptedEmail = EncryptionHelper.encryptData(email);
       final localUser = await SQLiteHelper.instance.query(
         'Users',
@@ -409,13 +408,13 @@ class AuthService extends ChangeNotifier {
 
       final userData = localUser.first;
 
-      // Decrypt stored security answers for comparison
+      // Decrypt stored security answers
       final storedMothersMaidenName = EncryptionHelper.decryptData(userData['mothersMaidenName'] as String);
       final storedChildhoodFriend = EncryptionHelper.decryptData(userData['childhoodFriend'] as String);
       final storedChildhoodPet = EncryptionHelper.decryptData(userData['childhoodPet'] as String);
       final storedSecurityQuestion = EncryptionHelper.decryptData(userData['securityQuestion'] as String);
 
-      // Convert all answers to lowercase for case-insensitive comparison
+      // Convert all answers to lowercase
       final normalizedInput = {
         'mothersMaidenName': mothersMaidenName.trim().toLowerCase(),
         'childhoodFriend': childhoodFriend.trim().toLowerCase(),
@@ -434,7 +433,7 @@ class AuthService extends ChangeNotifier {
       Map<String, String> fieldErrors = {};
       int correctAnswers = 0;
 
-      // Check each field individually
+      // Check each field
       if (normalizedInput['mothersMaidenName'] == normalizedStored['mothersMaidenName']) {
         correctAnswers++;
       } else {
@@ -511,7 +510,6 @@ class AuthService extends ChangeNotifier {
 
   Future<Map<String, dynamic>> resetPassword(String newPassword) async {
     try {
-      // Ensure the user is logged in
       if (_currentUser == null) {
         return {
           'success': false,
@@ -523,7 +521,7 @@ class AuthService extends ChangeNotifier {
       final newSalt = _generateSalt();
       final newHashedPassword = _hashPassword(newPassword, newSalt);
 
-      // Update password in SQLite
+      // Update password
       await SQLiteHelper.instance.update(
           'Users',
           {

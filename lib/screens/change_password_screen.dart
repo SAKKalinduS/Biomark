@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
-import '../screens/profile_screen.dart'; // Import the home screen
+import '../screens/profile_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -42,7 +42,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   void _validateForm() {
     setState(() {
-      // Password requirements: at least 8 characters, 1 uppercase, 1 number
+      //at least 8 characters, 1 uppercase, 1 number
       final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*\d).{8,}$');
 
       bool isNewPasswordValid = passwordRegex.hasMatch(_newPasswordController.text);

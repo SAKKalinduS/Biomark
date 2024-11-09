@@ -105,7 +105,7 @@ class _UpdateEmailScreenState extends State<UpdateEmailScreen> {
           ),
         ),
         _buildErrorText(errorText),
-        SizedBox(height: 16), // Space after error message
+        SizedBox(height: 16),
       ],
     );
   }
